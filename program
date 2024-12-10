@@ -1,0 +1,74 @@
+# Rat in a Maze Problem:
+# A rat is initially positioned at the top-left corner of an N x N maze (0, 0) 
+# and needs to reach the bottom-right corner (N-1, N-1). The maze contains cells 
+# with values 0 and 1. A value of 1 indicates the cell is open and can be traversed, 
+# while a value of 0 indicates the cell is blocked. The rat can move in four directions:
+# 'U' (up), 'D' (down), 'L' (left), and 'R' (right). 
+# The goal is to find all possible paths from the start to the destination without revisiting cells, 
+# and return these paths in lexicographical order. If the starting cell is blocked, no paths are possible.
+
+# Function to solve the Rat in a Maze problem
+
+# Directions in which the rat can move
+directions = "DLRU"
+
+# Arrays to represent changes in rows and columns for each direction
+row_change = [1, 0, 0, -1]  # Down, Left, Right, Up
+col_change = [0, -1, 1, 0]
+
+# Function to check if the next cell is valid
+def is_cell_valid(current_row, current_col, maze_size, maze):
+    return 0 <= current_row < maze_size and 0 <= current_col < maze_size and maze[current_row][current_col] == 1
+
+# Recursive function to explore all possible paths
+def explore_paths(current_row, current_col, maze, maze_size, all_paths, current_path):
+    # If the destination is reached, store the current path
+    if current_row == maze_size - 1 and current_col == maze_size - 1:
+        all_paths.append(current_path)
+        return
+
+    # Mark the current cell as visited
+    maze[current_row][current_col] = 0
+
+    # Check all possible moves
+    for direction_index in range(4):
+        next_row = current_row + row_change[direction_index]
+        next_col = current_col + col_change[direction_index]
+
+        # If the next cell is valid, proceed to explore it
+        if is_cell_valid(next_row, next_col, maze_size, maze):
+            current_path += directions[direction_index]
+            explore_paths(next_row, next_col, maze, maze_size, all_paths, current_path)
+            current_path = current_path[:-1]  # Backtrack to explore other paths
+
+    # Unmark the current cell to allow other paths to use it
+    maze[current_row][current_col] = 1
+
+# Function to find all paths from source to destination
+def find_paths_in_maze(maze):
+    maze_size = len(maze)
+    all_paths = []
+
+    # If the starting or ending cell is blocked, return no paths
+    if maze[0][0] == 0 or maze[maze_size - 1][maze_size - 1] == 0:
+        return all_paths
+
+    # Start exploring paths
+    explore_paths(0, 0, maze, maze_size, all_paths, "")
+
+    # Return the paths in lexicographical order
+    return sorted(all_paths)
+
+# Example usage
+maze_grid = [
+    [1, 1, 1],
+    [1, 0, 1],
+    [1, 1, 1]
+]
+
+result = find_paths_in_maze(maze_grid)
+
+if not result:
+    print(-1)  # No paths found
+else:
+    print(" ".join(result))  # Print paths in lexicographical order
